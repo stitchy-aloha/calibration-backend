@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,6 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { Role } from '../role/role.entity.js';
 
 @Entity('user')
@@ -15,6 +17,7 @@ export class User {
   @Column({ type: 'varchar', length: 100, unique: true })
   username: string;
 
+  @Exclude()
   @Column({ type: 'varchar', length: 255 })
   password: string;
 

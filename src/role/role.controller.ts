@@ -2,7 +2,7 @@ import {
   Controller,
   Get,
   Post,
-  Put,
+  Patch,
   Delete,
   Body,
   Param,
@@ -37,7 +37,7 @@ export class RoleController {
     return this.roleService.create(createRoleDto);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'แก้ไข Role' })
   @ApiParam({ name: 'id', type: Number, description: 'ID ของ Role' })
   update(

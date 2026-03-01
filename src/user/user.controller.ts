@@ -2,13 +2,14 @@ import {
   Controller,
   Get,
   Post,
-  Put,
+  Patch,
   Delete,
   Body,
   Param,
   ParseIntPipe,
   UploadedFile,
   UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -33,6 +34,7 @@ const imageStorage = diskStorage({
 });
 
 @ApiTags('Users')
+@UseInterceptors(ClassSerializerInterceptor)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -79,7 +81,7 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'แก้ไขข้อมูลผู้ใช้ (พร้อมอัปโหลดรูป)' })
   @ApiParam({ name: 'id', type: Number, description: 'ID ของผู้ใช้' })
   @ApiConsumes('multipart/form-data')
