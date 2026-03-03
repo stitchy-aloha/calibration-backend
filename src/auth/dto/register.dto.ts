@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   IsNotEmpty,
   IsOptional,
@@ -15,6 +16,7 @@ export class RegisterDto {
   @IsString()
   username: string;
 
+  // eslint-disable-next-line prettier/prettier
   @ApiProperty({ example: '123456', description: 'รหัสผ่าน (ขั้นต่ำ 6 ตัวอักษร)', minLength: 6 })
   @IsNotEmpty()
   @IsString()
