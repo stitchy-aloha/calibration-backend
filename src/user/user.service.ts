@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.entity.js';
+import { Role } from '../role/role.entity.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 
@@ -66,6 +67,13 @@ export class UserService {
     }
 
     Object.assign(user, updateUserDto);
+
+    // If roleId is being updated, we need to update the role object as well
+    // because TypeORM's save method will prioritize the 'role' property (if loaded)
+    // over the 'roleId' property. Since it's eager-loaded, it's always there.
+    if (updateUserDto.roleId !== undefined) {
+      user.role = { id: updateUserDto.roleId } as Role;
+    }
     await this.userRepository.save(user);
     return this.findOne(id);
   }
