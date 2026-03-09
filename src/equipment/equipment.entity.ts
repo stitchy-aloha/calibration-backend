@@ -1,0 +1,59 @@
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from 'typeorm';
+
+export type EquipmentStatus = 'active' | 'inactive' | 'maintenance';
+
+@Entity('equipment')
+export class Equipment {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ type: 'varchar', length: 255 })
+  name: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  asset_code: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  serial_number: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  manufacturer: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  model: string;
+
+  @Column({
+    type: 'enum',
+    enum: ['active', 'inactive', 'maintenance'],
+    default: 'active',
+  })
+  status: EquipmentStatus;
+
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  path_pdf: string;
+
+  @Column({ type: 'int', nullable: true })
+  interval: number;
+
+  @Column({ type: 'date', nullable: true })
+  calibration_due_date: Date;
+
+  @Column({ type: 'date', nullable: true })
+  calibration_date_last: Date;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
+}

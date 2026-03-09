@@ -6,6 +6,9 @@ import { AppService } from './app.service.js';
 import { RoleModule } from './role/role.module.js';
 import { UserModule } from './user/user.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { EquipmentModule } from './equipment/equipment.module.js';
+import { TaskModule } from './task/task.module.js';
+import { PmChecklistModule } from './pm-checklist/pm-checklist.module.js';
 
 @Module({
   imports: [
@@ -27,6 +30,9 @@ import { AuthModule } from './auth/auth.module.js';
     RoleModule,
     UserModule,
     AuthModule,
+    EquipmentModule,
+    TaskModule,
+    PmChecklistModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -41,6 +41,11 @@ export class UpdateUserDto {
   @IsString()
   imageUrl?: string;
 
+  @ApiPropertyOptional({ example: 'ช่างสอบเทียบ', description: 'ตำแหน่ง' })
+  @IsOptional()
+  @IsString()
+  position?: string;
+
   @ApiPropertyOptional({ example: 1, description: 'ID ของ Role' })
   @IsOptional()
   @Type(() => Number)
