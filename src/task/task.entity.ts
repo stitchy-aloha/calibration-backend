@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../user/user.entity.js';
+import { Equipment } from '../equipment/equipment.entity.js';
 
 export type TaskStatus = 'Pending' | 'InProgress' | 'Done';
 export type OverallResult = 'Pass' | 'Fail' | 'NA';
@@ -17,6 +18,10 @@ export class Task {
 
   @Column({ type: 'int', nullable: true })
   equipment_id: number;
+
+  @ManyToOne(() => Equipment, { nullable: true, eager: false })
+  @JoinColumn({ name: 'equipment_id' })
+  equipment: Equipment;
 
   @Column({ type: 'varchar', length: 50, nullable: true, unique: true })
   pm_no: string;

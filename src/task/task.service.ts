@@ -13,7 +13,7 @@ export class TaskService {
 
   findAll(): Promise<Task[]> {
     return this.taskRepo.find({
-      relations: ['technician'],
+      relations: ['technician', 'equipment'],
       order: { id: 'DESC' },
     });
   }
