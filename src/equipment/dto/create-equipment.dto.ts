@@ -53,4 +53,14 @@ export class CreateEquipmentDto {
   @IsInt()
   @IsPositive()
   interval?: number;
+
+  @ApiProperty({ example: '2025-12-26', required: false })
+  @IsOptional()
+  @IsString()
+  calibration_due_date?: string;
+
+  @ApiProperty({ example: '2025-06-26', required: false })
+  @IsOptional()
+  @IsString()
+  calibration_date_last?: string;
 }

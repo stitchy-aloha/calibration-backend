@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   IsOptional,
   IsString,
@@ -15,7 +14,11 @@ export class UpdateUserDto {
   @IsString()
   username?: string;
 
-  @ApiPropertyOptional({ example: '123456', description: 'รหัสผ่าน (ขั้นต่ำ 6 ตัวอักษร)', minLength: 6 })
+  @ApiPropertyOptional({
+    example: '123456',
+    description: 'รหัสผ่าน (ขั้นต่ำ 6 ตัวอักษร)',
+    minLength: 6,
+  })
   @IsOptional()
   @IsString()
   @MinLength(6)
@@ -36,7 +39,10 @@ export class UpdateUserDto {
   @IsString()
   tel?: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg', description: 'URL รูปภาพ' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/avatar.jpg',
+    description: 'URL รูปภาพ',
+  })
   @IsOptional()
   @IsString()
   imageUrl?: string;

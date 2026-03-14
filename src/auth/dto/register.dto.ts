@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   IsNotEmpty,
   IsOptional,
@@ -16,8 +15,11 @@ export class RegisterDto {
   @IsString()
   username: string;
 
-  // eslint-disable-next-line prettier/prettier
-  @ApiProperty({ example: '123456', description: 'รหัสผ่าน (ขั้นต่ำ 6 ตัวอักษร)', minLength: 6 })
+  @ApiProperty({
+    example: '123456',
+    description: 'รหัสผ่าน (ขั้นต่ำ 6 ตัวอักษร)',
+    minLength: 6,
+  })
   @IsNotEmpty()
   @IsString()
   @MinLength(6)
@@ -38,7 +40,10 @@ export class RegisterDto {
   @IsString()
   tel?: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg', description: 'URL รูปภาพ' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/avatar.jpg',
+    description: 'URL รูปภาพ',
+  })
   @IsOptional()
   @IsString()
   imageUrl?: string;

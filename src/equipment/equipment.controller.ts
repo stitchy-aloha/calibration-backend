@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
+  Delete,
   Param,
   Body,
   ParseIntPipe,
@@ -18,6 +20,7 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { EquipmentService } from './equipment.service.js';
 import { CreateEquipmentDto } from './dto/create-equipment.dto.js';
+import { UpdateEquipmentDto } from './dto/update-equipment.dto.js';
 
 @ApiTags('Equipment')
 @Controller('equipment')
@@ -51,5 +54,26 @@ export class EquipmentController {
   @ApiResponse({ status: 201, description: 'เพิ่มเครื่องมือสำเร็จ' })
   create(@Body() dto: CreateEquipmentDto) {
     return this.equipmentService.create(dto);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'แก้ไขข้อมูลเครื่องมือ' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'แก้ไขสำเร็จ' })
+  @ApiResponse({ status: 404, description: 'ไม่พบเครื่องมือ' })
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateEquipmentDto,
+  ) {
+    return this.equipmentService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'ลบเครื่องมือ' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'ลบสำเร็จ' })
+  @ApiResponse({ status: 404, description: 'ไม่พบเครื่องมือ' })
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.equipmentService.remove(id);
   }
 }
