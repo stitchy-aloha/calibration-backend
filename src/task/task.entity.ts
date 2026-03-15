@@ -15,6 +15,8 @@ import { Environment } from './entities/environment.entity.js';
 import { Measurement } from './entities/measurement.entity.js';
 import { Qualitative } from './entities/qualitative.entity.js';
 import { StandardTool } from '../standard-tool/standard-tool.entity.js';
+import { PmChecklistResult } from '../pm-checklist/entities/pm-checklist-result.entity.js';
+import { PmCategoryRemark } from '../pm-checklist/entities/pm-category-remark.entity.js';
 
 export type TaskStatus =
   | 'Pending'
@@ -49,6 +51,9 @@ export class Task {
   @Column({ type: 'varchar', length: 500, nullable: true })
   path_pdf_pm: string;
 
+  @Column({ type: 'text', nullable: true })
+  remarks?: string;
+
   @Column({ type: 'int', nullable: true })
   task_user: number;
 
@@ -79,6 +84,12 @@ export class Task {
     inverseJoinColumn: { name: 'standard_tool_id', referencedColumnName: 'id' },
   })
   standardTools: StandardTool[];
+
+  @OneToMany(() => PmChecklistResult, (result) => result.task)
+  checklistResults: PmChecklistResult[];
+
+  @OneToMany(() => PmCategoryRemark, (remark) => remark.task)
+  checklistRemarks: PmCategoryRemark[];
 
   @CreateDateColumn()
   createdAt: Date;

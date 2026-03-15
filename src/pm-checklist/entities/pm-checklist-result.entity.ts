@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Task } from '../../task/task.entity.js';
+import { ChecklistItem } from './checklist-item.entity.js';
 
 export type ItemStatus = 'Pass' | 'Fail' | 'NA';
 
@@ -15,4 +23,12 @@ export class PmChecklistResult {
 
   @Column({ type: 'varchar', length: 10 })
   status: ItemStatus;
+
+  @ManyToOne(() => Task, { nullable: false })
+  @JoinColumn({ name: 'task_id' })
+  task: Task;
+
+  @ManyToOne(() => ChecklistItem, { nullable: false })
+  @JoinColumn({ name: 'item_id' })
+  item: ChecklistItem;
 }

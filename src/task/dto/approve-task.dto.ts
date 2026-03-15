@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsPositive } from 'class-validator';
+import {
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsPositive,
+  IsString,
+} from 'class-validator';
 
 export class ApproveTaskDto {
   @ApiProperty({ example: 1, description: 'User ID ของผู้ที่ทำการอนุมัติ' })
@@ -14,4 +20,13 @@ export class ApproveTaskDto {
   })
   @IsEnum(['Approve', 'Reject'])
   decision: 'Approve' | 'Reject';
+
+  @ApiProperty({
+    example: 'Reason for rejection...',
+    description: 'หมายเหตุเพิ่มเติม (ถ้ามี)',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  remarks?: string;
 }

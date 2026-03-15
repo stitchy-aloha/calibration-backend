@@ -39,6 +39,10 @@ export class TaskService {
         'measurements',
         'qualitatives',
         'standardTools',
+        'checklistResults',
+        'checklistResults.item',
+        'checklistRemarks',
+        'checklistRemarks.category',
       ],
       order: { id: 'DESC' },
     });
@@ -55,6 +59,10 @@ export class TaskService {
         'measurements',
         'qualitatives',
         'standardTools',
+        'checklistResults',
+        'checklistResults.item',
+        'checklistRemarks',
+        'checklistRemarks.category',
       ],
     });
     if (!task) throw new NotFoundException(`Task #${id} not found`);
@@ -167,6 +175,7 @@ export class TaskService {
     if (dto.decision === 'Approve') {
       task.status = 'Approved';
       task.approver_id = dto.approver_id;
+      task.remarks = dto.remarks;
 
       if (task.equipment_id) {
         const finalStatus =
@@ -178,6 +187,7 @@ export class TaskService {
     } else {
       task.status = 'Rejected';
       task.approver_id = dto.approver_id;
+      task.remarks = dto.remarks;
     }
 
     return this.taskRepo.save(task);
