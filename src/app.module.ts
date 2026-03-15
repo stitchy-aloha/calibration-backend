@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { EquipmentModule } from './equipment/equipment.module.js';
 import { TaskModule } from './task/task.module.js';
 import { PmChecklistModule } from './pm-checklist/pm-checklist.module.js';
+import { StandardToolModule } from './standard-tool/standard-tool.module.js';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { PmChecklistModule } from './pm-checklist/pm-checklist.module.js';
     EquipmentModule,
     TaskModule,
     PmChecklistModule,
+    StandardToolModule,
   ],
   controllers: [AppController],
   providers: [AppService],

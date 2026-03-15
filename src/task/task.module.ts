@@ -3,9 +3,23 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Task } from './task.entity.js';
 import { TaskService } from './task.service.js';
 import { TaskController } from './task.controller.js';
+import { StandardTool } from '../standard-tool/standard-tool.entity.js';
+import { Environment } from './entities/environment.entity.js';
+import { Measurement } from './entities/measurement.entity.js';
+import { Qualitative } from './entities/qualitative.entity.js';
+import { EquipmentModule } from '../equipment/equipment.module.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Task])],
+  imports: [
+    TypeOrmModule.forFeature([
+      Task,
+      StandardTool,
+      Environment,
+      Measurement,
+      Qualitative,
+    ]),
+    EquipmentModule,
+  ],
   controllers: [TaskController],
   providers: [TaskService],
   exports: [TypeOrmModule, TaskService],

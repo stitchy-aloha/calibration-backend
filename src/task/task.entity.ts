@@ -4,11 +4,25 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+  CreateDateColumn,
 } from 'typeorm';
 import { User } from '../user/user.entity.js';
 import { Equipment } from '../equipment/equipment.entity.js';
+import { Environment } from './entities/environment.entity.js';
+import { Measurement } from './entities/measurement.entity.js';
+import { Qualitative } from './entities/qualitative.entity.js';
+import { StandardTool } from '../standard-tool/standard-tool.entity.js';
 
-export type TaskStatus = 'Pending' | 'InProgress' | 'Done';
+export type TaskStatus =
+  | 'Pending'
+  | 'InProgress'
+  | 'PendingApproval'
+  | 'Approved'
+  | 'Rejected'
+  | 'Done';
 export type OverallResult = 'Pass' | 'Fail' | 'NA';
 
 @Entity('tasks')
@@ -29,7 +43,7 @@ export class Task {
   @Column({ type: 'varchar', length: 20, nullable: true })
   overall_result: OverallResult;
 
-  @Column({ type: 'varchar', length: 20, nullable: true })
+  @Column({ type: 'varchar', length: 20, default: 'Pending' })
   status: TaskStatus;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
@@ -41,4 +55,31 @@ export class Task {
   @ManyToOne(() => User, { nullable: true, eager: false })
   @JoinColumn({ name: 'task_user' })
   technician: User;
+
+  @Column({ type: 'int', nullable: true })
+  approver_id: number;
+
+  @ManyToOne(() => User, { nullable: true, eager: false })
+  @JoinColumn({ name: 'approver_id' })
+  approver: User;
+
+  @OneToMany(() => Environment, (env) => env.task)
+  environments: Environment[];
+
+  @OneToMany(() => Measurement, (m) => m.task)
+  measurements: Measurement[];
+
+  @OneToMany(() => Qualitative, (q) => q.task)
+  qualitatives: Qualitative[];
+
+  @ManyToMany(() => StandardTool)
+  @JoinTable({
+    name: 'standard_detail',
+    joinColumn: { name: 'task_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'standard_tool_id', referencedColumnName: 'id' },
+  })
+  standardTools: StandardTool[];
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

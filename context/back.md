@@ -65,4 +65,5 @@ CREATE TABLE `task_user` (
   `approver_id` int,
   FOREIGN KEY (`task_id`) REFERENCES `Task`(`id`)
 );
+
 ```
