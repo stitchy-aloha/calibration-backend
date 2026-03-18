@@ -47,6 +47,14 @@ export class UpdateUserDto {
   @IsString()
   imageUrl?: string;
 
+  @ApiPropertyOptional({
+    example: 'https://example.com/signature.png',
+    description: 'URL ลายเซ็นดิจิทัล',
+  })
+  @IsOptional()
+  @IsString()
+  signatureUrl?: string;
+
   @ApiPropertyOptional({ example: 'ช่างสอบเทียบ', description: 'ตำแหน่ง' })
   @IsOptional()
   @IsString()

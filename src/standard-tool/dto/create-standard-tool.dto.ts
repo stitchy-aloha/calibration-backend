@@ -9,17 +9,28 @@ import {
 } from 'class-validator';
 
 export class CreateStandardToolDto {
-  @ApiProperty({ example: 'Digital Multimeter', description: 'ชื่อเครื่องมือมาตรฐาน' })
+  @ApiProperty({
+    example: 'Digital Multimeter',
+    description: 'ชื่อเครื่องมือมาตรฐาน',
+  })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ example: 'STD-001', required: false, description: 'รหัสทรัพย์สิน' })
+  @ApiProperty({
+    example: 'STD-001',
+    required: false,
+    description: 'รหัสทรัพย์สิน',
+  })
   @IsOptional()
   @IsString()
   asset_code?: string;
 
-  @ApiProperty({ example: 'SN123456', required: false, description: 'หมายเลขซีเรียล' })
+  @ApiProperty({
+    example: 'SN123456',
+    required: false,
+    description: 'หมายเลขซีเรียล',
+  })
   @IsOptional()
   @IsString()
   serial_number?: string;
@@ -34,17 +45,29 @@ export class CreateStandardToolDto {
   @IsString()
   model?: string;
 
-  @ApiProperty({ example: '/uploads/cert/std-001.pdf', required: false, description: 'พาธไฟล์ PDF ใบเซอร์' })
+  @ApiProperty({
+    example: '/uploads/cert/std-001.pdf',
+    required: false,
+    description: 'พาธไฟล์ PDF ใบเซอร์',
+  })
   @IsOptional()
   @IsString()
   path_pdf?: string;
 
-  @ApiProperty({ example: 'CERT-2024-001', required: false, description: 'เลขที่ใบรับรอง' })
+  @ApiProperty({
+    example: 'CERT-2024-001',
+    required: false,
+    description: 'เลขที่ใบรับรอง',
+  })
   @IsOptional()
   @IsString()
   certificate_number?: string;
 
-  @ApiProperty({ example: '2024-01-15', required: false, description: 'วันที่สอบเทียบล่าสุด' })
+  @ApiProperty({
+    example: '2024-01-15',
+    required: false,
+    description: 'วันที่สอบเทียบล่าสุด',
+  })
   @IsOptional()
   @IsDateString()
   calibration_date_last?: string;

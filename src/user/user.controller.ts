@@ -7,11 +7,11 @@ import {
   Body,
   Param,
   ParseIntPipe,
-  UploadedFile,
+  UploadedFiles,
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
@@ -25,13 +25,10 @@ import { UserService } from './user.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
 
-const imageStorage = diskStorage({
-  destination: './uploads/profiles',
-  filename: (_req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, `profile-${uniqueSuffix}${extname(file.originalname)}`);
-  },
-});
+interface UserUploadedFiles {
+  image?: Express.Multer.File[];
+  signature?: Express.Multer.File[];
+}
 
 @ApiTags('Users')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -53,7 +50,7 @@ export class UserController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'สร้างผู้ใช้ใหม่ (พร้อมอัปโหลดรูป)' })
+  @ApiOperation({ summary: 'สร้างผู้ใช้ใหม่ (พร้อมอัปโหลดรูปและลายเซ็น)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
@@ -65,24 +62,61 @@ export class UserController {
         name: { type: 'string', example: 'John Doe' },
         tel: { type: 'string', example: '0812345678' },
         roleId: { type: 'integer', example: 1 },
-        image: { type: 'string', format: 'binary', description: 'ไฟล์รูปภาพ' },
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'ไฟล์รูปภาพโปรไฟล์',
+        },
+        signature: {
+          type: 'string',
+          format: 'binary',
+          description: 'ไฟล์ลายเซ็น',
+        },
       },
       required: ['username', 'password'],
     },
   })
-  @UseInterceptors(FileInterceptor('image', { storage: imageStorage }))
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'signature', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: (req, file, cb) => {
+            const dest =
+              file.fieldname === 'signature'
+                ? './uploads/signatures'
+                : './uploads/profiles';
+            cb(null, dest);
+          },
+          filename: (req, file, cb) => {
+            const uniqueSuffix =
+              Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const prefix = file.fieldname === 'signature' ? 'sig' : 'profile';
+            cb(null, `${prefix}-${uniqueSuffix}${extname(file.originalname)}`);
+          },
+        }),
+      },
+    ),
+  )
   create(
     @Body() createUserDto: CreateUserDto,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFiles()
+    files: UserUploadedFiles,
   ) {
-    if (file) {
-      createUserDto.imageUrl = `/uploads/profiles/${file.filename}`;
+    if (files?.image?.[0]) {
+      createUserDto.imageUrl = `/uploads/profiles/${files.image[0].filename}`;
+    }
+    if (files?.signature?.[0]) {
+      createUserDto.signatureUrl = `/uploads/signatures/${files.signature[0].filename}`;
     }
     return this.userService.create(createUserDto);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'แก้ไขข้อมูลผู้ใช้ (พร้อมอัปโหลดรูป)' })
+  @ApiOperation({ summary: 'แก้ไขข้อมูลผู้ใช้ (พร้อมอัปโหลดรูปและลายเซ็น)' })
   @ApiParam({ name: 'id', type: Number, description: 'ID ของผู้ใช้' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -95,18 +129,55 @@ export class UserController {
         name: { type: 'string', example: 'John Doe' },
         tel: { type: 'string', example: '0812345678' },
         roleId: { type: 'number', example: 1 },
-        image: { type: 'string', format: 'binary', description: 'ไฟล์รูปภาพ' },
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'ไฟล์รูปภาพโปรไฟล์',
+        },
+        signature: {
+          type: 'string',
+          format: 'binary',
+          description: 'ไฟล์ลายเซ็น',
+        },
       },
     },
   })
-  @UseInterceptors(FileInterceptor('image', { storage: imageStorage }))
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'signature', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: (req, file, cb) => {
+            const dest =
+              file.fieldname === 'signature'
+                ? './uploads/signatures'
+                : './uploads/profiles';
+            cb(null, dest);
+          },
+          filename: (req, file, cb) => {
+            const uniqueSuffix =
+              Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const prefix = file.fieldname === 'signature' ? 'sig' : 'profile';
+            cb(null, `${prefix}-${uniqueSuffix}${extname(file.originalname)}`);
+          },
+        }),
+      },
+    ),
+  )
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFiles()
+    files: UserUploadedFiles,
   ) {
-    if (file) {
-      updateUserDto.imageUrl = `/uploads/profiles/${file.filename}`;
+    if (files?.image?.[0]) {
+      updateUserDto.imageUrl = `/uploads/profiles/${files.image[0].filename}`;
+    }
+    if (files?.signature?.[0]) {
+      updateUserDto.signatureUrl = `/uploads/signatures/${files.signature[0].filename}`;
     }
     return this.userService.update(id, updateUserDto);
   }

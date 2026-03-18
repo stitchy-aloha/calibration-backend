@@ -102,7 +102,10 @@ export class TaskService {
       console.log('Old data cleared');
 
       // 1. Save Environment - use task object so TypeORM sets the FK correctly
-      if (dto.ambient_temp !== undefined || dto.ambient_humidity !== undefined) {
+      if (
+        dto.ambient_temp !== undefined ||
+        dto.ambient_humidity !== undefined
+      ) {
         const env = new Environment();
         env.ambient_temp = dto.ambient_temp ?? 0;
         env.ambient_humidity = dto.ambient_humidity ?? 0;

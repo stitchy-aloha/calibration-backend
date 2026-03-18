@@ -30,10 +30,7 @@ export class StandardToolService {
     return this.standardToolRepo.save(tool);
   }
 
-  async update(
-    id: number,
-    dto: UpdateStandardToolDto,
-  ): Promise<StandardTool> {
+  async update(id: number, dto: UpdateStandardToolDto): Promise<StandardTool> {
     const tool = await this.findOne(id);
     Object.assign(tool, dto);
     return this.standardToolRepo.save(tool);

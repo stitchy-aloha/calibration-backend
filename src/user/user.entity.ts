@@ -30,10 +30,10 @@ export class User {
   tel: string;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
-  imageUrl: string;
+  signatureUrl: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  position: string;
+  @Column({ type: 'varchar', length: 500, nullable: true })
+  imageUrl: string;
 
   @Column({ nullable: true })
   roleId: number;

@@ -90,7 +90,10 @@ export class SubmitTaskDto {
   @IsNumber({}, { each: true })
   standard_tool_ids?: number[];
 
-  @ApiProperty({ type: [MeasurementDto], description: 'รายการผลการวัดเชิงปริมาณ' })
+  @ApiProperty({
+    type: [MeasurementDto],
+    description: 'รายการผลการวัดเชิงปริมาณ',
+  })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })

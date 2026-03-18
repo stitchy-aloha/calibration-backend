@@ -53,19 +53,13 @@ export class TaskController {
 
   @Patch(':id/submit')
   @ApiOperation({ summary: 'ช่างส่งผลการสอบเทียบ' })
-  submit(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: SubmitTaskDto,
-  ) {
+  submit(@Param('id', ParseIntPipe) id: number, @Body() dto: SubmitTaskDto) {
     return this.taskService.submitTask(id, dto);
   }
 
   @Patch(':id/approve')
   @ApiOperation({ summary: 'หัวหน้าอนุมัติ/ตีกลับ ผลการสอบเทียบ' })
-  approve(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: ApproveTaskDto,
-  ) {
+  approve(@Param('id', ParseIntPipe) id: number, @Body() dto: ApproveTaskDto) {
     return this.taskService.approveTask(id, dto);
   }
 }
