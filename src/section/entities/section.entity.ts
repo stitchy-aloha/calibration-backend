@@ -17,6 +17,9 @@ export class Section {
   @Column({ type: 'varchar', length: 255 })
   name: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  code: string;
+
   @Column({ type: 'varchar', length: 500, nullable: true })
   description: string;
 

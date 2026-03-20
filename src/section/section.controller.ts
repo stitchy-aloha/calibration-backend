@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Query,
   ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -31,10 +30,7 @@ export class SectionController {
 
   @Get()
   @ApiOperation({ summary: 'Get all sections' })
-  findAll(@Query('hospitalId') hospitalId?: string) {
-    if (hospitalId) {
-      return this.sectionService.findByHospital(+hospitalId);
-    }
+  findAll() {
     return this.sectionService.findAll();
   }
 

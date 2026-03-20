@@ -10,6 +10,11 @@ export class CreateSectionDto {
   @ApiProperty({ example: 'NUR', required: false })
   @IsString()
   @IsOptional()
+  code?: string;
+
+  @ApiProperty({ example: 'แผนกการพยาบาล', required: false })
+  @IsString()
+  @IsOptional()
   description?: string;
 
   @ApiProperty({ example: 1 })

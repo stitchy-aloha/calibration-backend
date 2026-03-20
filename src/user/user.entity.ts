@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Role } from '../role/role.entity.js';
+import { Hospital } from '../hospital/entities/hospital.entity.js';
 
 @Entity('user')
 export class User {
@@ -41,4 +42,11 @@ export class User {
   @ManyToOne(() => Role, (role) => role.users, { eager: true })
   @JoinColumn({ name: 'roleId' })
   role: Role;
+
+  @Column({ nullable: true })
+  hospitalId: number;
+
+  @ManyToOne(() => Hospital, (hospital) => hospital.users)
+  @JoinColumn({ name: 'hospitalId' })
+  hospital: Hospital;
 }

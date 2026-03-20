@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Section } from '../../section/entities/section.entity.js';
+import { User } from '../../user/user.entity.js';
 
 @Entity('hospital')
 export class Hospital {
@@ -23,4 +24,7 @@ export class Hospital {
 
   @OneToMany(() => Section, (section) => section.hospital)
   sections: Section[];
+
+  @OneToMany(() => User, (user) => user.hospital)
+  users: User[];
 }
