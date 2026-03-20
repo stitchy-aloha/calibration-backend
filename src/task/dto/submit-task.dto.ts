@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
@@ -53,6 +52,16 @@ class MeasurementDto {
   @ApiProperty({ enum: ['PASS', 'FAIL'], example: 'PASS' })
   @IsEnum(['PASS', 'FAIL'])
   result: 'PASS' | 'FAIL';
+
+  @ApiProperty({ example: 'Digital', required: false })
+  @IsOptional()
+  @IsString()
+  display_type?: string;
+
+  @ApiProperty({ example: '0.1', required: false })
+  @IsOptional()
+  @IsString()
+  resolution?: string;
 }
 
 class QualitativeDto {

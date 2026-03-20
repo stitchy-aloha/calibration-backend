@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -39,6 +38,12 @@ export class Measurement {
 
   @Column({ type: 'enum', enum: ['PASS', 'FAIL'], default: 'PASS' })
   result: 'PASS' | 'FAIL';
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  display_type: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  resolution: string | null;
 
   @ManyToOne(() => Task, (task) => task.measurements, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'task_id' })

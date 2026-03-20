@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable prettier/prettier */
+
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
@@ -127,6 +127,8 @@ export class TaskService {
           measurement.average_value = m.average_value ?? 0;
           measurement.error_value = m.error_value ?? 0;
           measurement.result = m.result;
+          measurement.display_type = m.display_type ?? null;
+          measurement.resolution = m.resolution ?? null;
           measurement.task = task;
           await this.measurementRepo.save(measurement);
         }
