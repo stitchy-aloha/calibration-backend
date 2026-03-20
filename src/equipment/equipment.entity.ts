@@ -5,9 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { EquipmentType } from './equipment-type.entity';
 
 export type EquipmentStatus = 'active' | 'inactive' | 'maintenance';
+export type RiskLevel = 'high' | 'medium' | 'low';
 
 @Entity('equipment')
 export class Equipment {
@@ -35,6 +39,20 @@ export class Equipment {
     default: 'active',
   })
   status: EquipmentStatus;
+
+  @Column({
+    type: 'enum',
+    enum: ['high', 'medium', 'low'],
+    default: 'medium',
+  })
+  risk_level: RiskLevel;
+
+  @Column({ type: 'int', nullable: true })
+  equipment_type_id: number;
+
+  @ManyToOne(() => EquipmentType, (type) => type.equipments)
+  @JoinColumn({ name: 'equipment_type_id' })
+  equipmentType: EquipmentType;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
   path_pdf: string;

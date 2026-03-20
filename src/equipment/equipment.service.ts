@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Equipment } from './equipment.entity.js';
-import { CreateEquipmentDto } from './dto/create-equipment.dto.js';
-import { UpdateEquipmentDto } from './dto/update-equipment.dto.js';
+import { Equipment } from './equipment.entity';
+import { CreateEquipmentDto } from './dto/create-equipment.dto';
+import { UpdateEquipmentDto } from './dto/update-equipment.dto';
 
 @Injectable()
 export class EquipmentService {
@@ -13,16 +13,23 @@ export class EquipmentService {
   ) {}
 
   findAll(): Promise<Equipment[]> {
-    return this.equipmentRepo.find({ order: { id: 'DESC' } });
+    return this.equipmentRepo.find({
+      relations: ['equipmentType'],
+      order: { id: 'DESC' },
+    });
   }
 
   findOne(id: number): Promise<Equipment | null> {
-    return this.equipmentRepo.findOne({ where: { id } });
+    return this.equipmentRepo.findOne({
+      where: { id },
+      relations: ['equipmentType'],
+    });
   }
 
-  create(dto: CreateEquipmentDto): Promise<Equipment> {
+  async create(dto: CreateEquipmentDto): Promise<Equipment> {
     const equipment = this.equipmentRepo.create(dto);
-    return this.equipmentRepo.save(equipment);
+    const saved = await this.equipmentRepo.save(equipment);
+    return this.findOne(saved.id) as Promise<Equipment>;
   }
 
   async update(id: number, dto: UpdateEquipmentDto): Promise<Equipment> {
@@ -30,8 +37,16 @@ export class EquipmentService {
     if (!equipment) {
       throw new NotFoundException(`Equipment #${id} not found`);
     }
+
+    // If equipment_type_id is being updated, clear the loaded relation
+    // to force TypeORM to use the ID column
+    if (dto.equipment_type_id !== undefined) {
+      (equipment as any).equipmentType = undefined;
+    }
+
     Object.assign(equipment, dto);
-    return this.equipmentRepo.save(equipment);
+    await this.equipmentRepo.save(equipment);
+    return this.findOne(id) as Promise<Equipment>;
   }
 
   async remove(id: number): Promise<void> {

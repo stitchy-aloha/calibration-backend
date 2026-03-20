@@ -7,7 +7,7 @@ import {
   IsPositive,
   IsString,
 } from 'class-validator';
-import type { EquipmentStatus } from '../equipment.entity.js';
+import type { EquipmentStatus, RiskLevel } from '../equipment.entity.js';
 
 export class CreateEquipmentDto {
   @ApiProperty({ example: 'เครื่องวัดความดัน' })
@@ -63,4 +63,18 @@ export class CreateEquipmentDto {
   @IsOptional()
   @IsString()
   calibration_date_last?: string;
+
+  @ApiProperty({
+    example: 'medium',
+    enum: ['high', 'medium', 'low'],
+    required: false,
+  })
+  @IsOptional()
+  @IsEnum(['high', 'medium', 'low'])
+  risk_level?: RiskLevel;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
+  @IsInt()
+  equipment_type_id?: number;
 }
