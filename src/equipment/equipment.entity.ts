@@ -8,7 +8,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { EquipmentType } from './equipment-type.entity';
+import { EquipmentType } from './equipment-type.entity.js';
+import { Section } from '../section/entities/section.entity.js';
 
 export type EquipmentStatus = 'active' | 'inactive' | 'maintenance';
 export type RiskLevel = 'high' | 'medium' | 'low';
@@ -65,6 +66,13 @@ export class Equipment {
 
   @Column({ type: 'date', nullable: true })
   calibration_date_last: Date;
+
+  @Column({ nullable: true })
+  sectionId: number;
+
+  @ManyToOne(() => Section, (section) => section.equipments)
+  @JoinColumn({ name: 'sectionId' })
+  section: Section;
 
   @CreateDateColumn()
   createdAt: Date;

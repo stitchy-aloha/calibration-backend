@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Equipment } from './equipment.entity';
-import { CreateEquipmentDto } from './dto/create-equipment.dto';
-import { UpdateEquipmentDto } from './dto/update-equipment.dto';
+import { Equipment } from './equipment.entity.js';
+import { CreateEquipmentDto } from './dto/create-equipment.dto.js';
+import { UpdateEquipmentDto } from './dto/update-equipment.dto.js';
 
 @Injectable()
 export class EquipmentService {
@@ -14,7 +14,7 @@ export class EquipmentService {
 
   findAll(): Promise<Equipment[]> {
     return this.equipmentRepo.find({
-      relations: ['equipmentType'],
+      relations: ['equipmentType', 'section', 'section.hospital'],
       order: { id: 'DESC' },
     });
   }
@@ -22,7 +22,7 @@ export class EquipmentService {
   findOne(id: number): Promise<Equipment | null> {
     return this.equipmentRepo.findOne({
       where: { id },
-      relations: ['equipmentType'],
+      relations: ['equipmentType', 'section', 'section.hospital'],
     });
   }
 

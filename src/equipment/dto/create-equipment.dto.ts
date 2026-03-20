@@ -77,4 +77,9 @@ export class CreateEquipmentDto {
   @IsOptional()
   @IsInt()
   equipment_type_id?: number;
+
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
+  @IsInt()
+  sectionId?: number;
 }

@@ -10,6 +10,8 @@ import { EquipmentModule } from './equipment/equipment.module.js';
 import { TaskModule } from './task/task.module.js';
 import { PmChecklistModule } from './pm-checklist/pm-checklist.module.js';
 import { StandardToolModule } from './standard-tool/standard-tool.module.js';
+import { HospitalModule } from './hospital/hospital.module.js';
+import { SectionModule } from './section/section.module.js';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { StandardToolModule } from './standard-tool/standard-tool.module.js';
     TaskModule,
     PmChecklistModule,
     StandardToolModule,
+    HospitalModule,
+    SectionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
