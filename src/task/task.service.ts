@@ -141,6 +141,9 @@ export class TaskService {
           measurement.result = m.result;
           measurement.display_type = m.display_type ?? null;
           measurement.resolution = m.resolution ?? null;
+          measurement.ucb1 = m.ucb1 ?? null;
+          measurement.ucb2 = m.ucb2 ?? null;
+          measurement.ucb3 = m.ucb3 ?? null;
           measurement.task = task;
           await this.measurementRepo.save(measurement);
         }
