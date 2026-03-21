@@ -12,6 +12,8 @@ import { PmChecklistModule } from './pm-checklist/pm-checklist.module.js';
 import { StandardToolModule } from './standard-tool/standard-tool.module.js';
 import { HospitalModule } from './hospital/hospital.module.js';
 import { SectionModule } from './section/section.module.js';
+import { CalibrationProcessModule } from './calibration-process/calibration-process.module.js';
+import { CalibrationCostModule } from './calibration-cost/calibration-cost.module.js';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import { SectionModule } from './section/section.module.js';
     StandardToolModule,
     HospitalModule,
     SectionModule,
+    CalibrationProcessModule,
+    CalibrationCostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
