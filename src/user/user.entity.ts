@@ -36,6 +36,9 @@ export class User {
   @Column({ type: 'varchar', length: 500, nullable: true })
   imageUrl: string;
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  lineUserId: string;
+
   @Column({ nullable: true })
   roleId: number;
 

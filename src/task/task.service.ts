@@ -12,8 +12,10 @@ import { Environment } from './entities/environment.entity.js';
 import { Measurement } from './entities/measurement.entity.js';
 import { Qualitative } from './entities/qualitative.entity.js';
 import { SpecificParameter } from './entities/specific-parameter.entity.js';
-import { Equipment, EquipmentStatus } from '../equipment/equipment.entity.js';
+import { EquipmentStatus } from '../equipment/equipment.entity.js';
 import { EquipmentService } from '../equipment/equipment.service.js';
+import { LineService } from '../line/line.service.js';
+import { User } from '../user/user.entity.js';
 
 @Injectable()
 export class TaskService {
@@ -31,6 +33,9 @@ export class TaskService {
     @InjectRepository(SpecificParameter)
     private readonly specificParameterRepo: Repository<SpecificParameter>,
     private readonly equipmentService: EquipmentService,
+    private readonly lineService: LineService,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
   ) {}
 
   findAll(): Promise<Task[]> {
@@ -92,7 +97,22 @@ export class TaskService {
       status: 'Pending',
       pm_no,
     });
-    return this.taskRepo.save(task);
+    const saved = await this.taskRepo.save(task);
+
+    // Notify technician
+    try {
+      const fullTask = await this.findOne(saved.id);
+      if (fullTask.technician?.lineUserId) {
+        await this.lineService.pushMessage(
+          fullTask.technician.lineUserId,
+          `🔔 มีงานใหม่มอบหมายให้คุณ\nเลขที่: ${fullTask.pm_no}\nอุปกรณ์: ${fullTask.equipment?.name || '-'}\nสถานที่: ${fullTask.equipment?.section?.name || '-'}`,
+        );
+      }
+    } catch (err) {
+      console.error('Failed to send assignment notification', err);
+    }
+
+    return saved;
   }
 
   async submitTask(id: number, dto: SubmitTaskDto): Promise<Task> {
@@ -191,7 +211,8 @@ export class TaskService {
       task.status = 'PendingApproval';
 
       if (task.equipment_id) {
-        const finalEqStatus = task.overall_result === 'Fail' ? 'disabled' : 'calibrating';
+        const finalEqStatus =
+          task.overall_result === 'Fail' ? 'disabled' : 'calibrating';
         await this.equipmentService.update(task.equipment_id, {
           status: finalEqStatus,
         } as any);
@@ -199,6 +220,16 @@ export class TaskService {
 
       const finalTask = await this.taskRepo.save(task);
       console.log('=== Task submitted successfully ===');
+
+      // Notify Head of Dept (Broadcast for now, or specific ID if configured)
+      try {
+        await this.lineService.broadcastMessage(
+          `📝 มีรายการรอนุมัติใหม่\nเลขที่: ${finalTask.pm_no}\nจาก: ${finalTask.technician?.name || 'ช่างเทคนิค'}\nผลการทดสอบ: ${finalTask.overall_result}`,
+        );
+      } catch (err) {
+        console.error('Failed to send submission notification', err);
+      }
+
       return finalTask;
     } catch (error) {
       console.error('Submit Task Error:', error);
@@ -215,7 +246,9 @@ export class TaskService {
       task.remarks = dto.remarks;
 
       if (task.equipment_id) {
-        const equipment = await this.equipmentService.findOne(task.equipment_id);
+        const equipment = await this.equipmentService.findOne(
+          task.equipment_id,
+        );
         if (equipment) {
           const isPass = task.overall_result === 'Pass';
           const finalStatus = isPass ? 'ready' : 'disabled';
@@ -256,6 +289,27 @@ export class TaskService {
       }
     }
 
-    return this.taskRepo.save(task);
+    const savedTask = await this.taskRepo.save(task);
+
+    // Notify technician about the decision
+    try {
+      if (savedTask.technician?.lineUserId) {
+        const title =
+          savedTask.status === 'Approved'
+            ? '✅ งานของคุณได้รับการอนุมัติแล้ว'
+            : '⚠️ งานของคุณถูกตีกลับให้สอบเทียบใหม่';
+        const remarks = savedTask.remarks
+          ? `\nหมายเหตุ: ${savedTask.remarks}`
+          : '';
+        await this.lineService.pushMessage(
+          savedTask.technician.lineUserId,
+          `${title}\nเลขที่: ${savedTask.pm_no}${remarks}`,
+        );
+      }
+    } catch (err) {
+      console.error('Failed to send approval notification', err);
+    }
+
+    return savedTask;
   }
 }

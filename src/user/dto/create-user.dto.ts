@@ -61,6 +61,14 @@ export class CreateUserDto {
   @IsString()
   position?: string;
 
+  @ApiPropertyOptional({
+    example: 'U123456789abcdef0123456789abcdef',
+    description: 'LINE User ID',
+  })
+  @IsOptional()
+  @IsString()
+  lineUserId?: string;
+
   @ApiPropertyOptional({ example: 1, description: 'ID ของ Role' })
   @IsOptional()
   @Type(() => Number)

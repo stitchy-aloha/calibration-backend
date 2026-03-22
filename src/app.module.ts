@@ -14,6 +14,7 @@ import { HospitalModule } from './hospital/hospital.module.js';
 import { SectionModule } from './section/section.module.js';
 import { CalibrationProcessModule } from './calibration-process/calibration-process.module.js';
 import { CalibrationCostModule } from './calibration-cost/calibration-cost.module.js';
+import { LineModule } from './line/line.module.js';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { CalibrationCostModule } from './calibration-cost/calibration-cost.modul
     SectionModule,
     CalibrationProcessModule,
     CalibrationCostModule,
+    LineModule,
   ],
   controllers: [AppController],
   providers: [AppService],

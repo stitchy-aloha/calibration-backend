@@ -8,6 +8,7 @@ import { Environment } from './entities/environment.entity.js';
 import { Measurement } from './entities/measurement.entity.js';
 import { Qualitative } from './entities/qualitative.entity.js';
 import { SpecificParameter } from './entities/specific-parameter.entity.js';
+import { User } from '../user/user.entity.js';
 import { EquipmentModule } from '../equipment/equipment.module.js';
 
 @Module({
@@ -19,6 +20,7 @@ import { EquipmentModule } from '../equipment/equipment.module.js';
       Measurement,
       Qualitative,
       SpecificParameter,
+      User,
     ]),
     EquipmentModule,
   ],
