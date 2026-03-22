@@ -7,7 +7,12 @@ import {
   Param,
   Patch,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import {
   ApiTags,
   ApiOperation,
@@ -57,8 +62,39 @@ export class TaskController {
   }
 
   @Patch(':id/approve')
-  @ApiOperation({ summary: 'หัวหน้าอนุมัติ/ตีกลับ ผลการสอบเทียบ' })
-  approve(@Param('id', ParseIntPipe) id: number, @Body() dto: ApproveTaskDto) {
+  @ApiOperation({ summary: 'อนุมัติงาน PM' })
+  approveTask(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ApproveTaskDto,
+  ) {
     return this.taskService.approveTask(id, dto);
+  }
+
+  @Post(':id/upload-cer')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/certs',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          return cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  @ApiOperation({ summary: 'อัปโหลดไฟล์ CER PDF' })
+  uploadCer(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.taskService.updateCerPath(
+      id,
+      `/uploads/certs/${file.filename}`,
+    );
   }
 }

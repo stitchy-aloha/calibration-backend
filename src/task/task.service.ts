@@ -122,7 +122,7 @@ export class TaskService {
       // If TypeORM never loads those arrays, it CANNOT cascade-nullify them later
       const task = await this.taskRepo.findOne({
         where: { id },
-        relations: ['equipment', 'standardTools'],
+        relations: ['equipment', 'standardTools', 'technician'],
       });
       if (!task) throw new NotFoundException(`Task #${id} not found`);
       console.log(`Task found: id=${task.id}`);
@@ -207,6 +207,15 @@ export class TaskService {
         task.standardTools = standardTools;
       }
 
+      // Freeze technician info
+      if (task.technician) {
+        const tech = task.technician as any;
+        task.technician_name = tech.name;
+        task.technician_position = tech.position;
+        task.technician_signature_url = tech.signatureUrl;
+        console.log(`[DEBUG] Frozen Tech: ${task.technician_name}, ${task.technician_position}`);
+      }
+
       task.overall_result = dto.overall_result;
       task.status = 'PendingApproval';
 
@@ -245,6 +254,26 @@ export class TaskService {
       task.approver_id = dto.approver_id;
       task.approvedAt = new Date();
       task.remarks = dto.remarks;
+
+      // Freeze approver info
+      const approverFetch = (await this.userRepo.findOne({
+        where: { id: dto.approver_id },
+      })) as any;
+      if (approverFetch) {
+        task.approver_name = approverFetch.name;
+        task.approver_position = approverFetch.position;
+        task.approver_signature_url = approverFetch.signatureUrl;
+        console.log(`[DEBUG] Frozen Appr: ${task.approver_name}, ${task.approver_position}`);
+      }
+
+      // Safety: also freeze technician info if missing (for legacy tasks being approved now)
+      if (!task.technician_name && task.technician) {
+        const tech = task.technician as any;
+        task.technician_name = tech.name;
+        task.technician_position = tech.position;
+        task.technician_signature_url = tech.signatureUrl;
+        console.log(`[DEBUG] Frozen Tech on Approval: ${task.technician_name}`);
+      }
 
       if (task.equipment_id) {
         const equipment = await this.equipmentService.findOne(
@@ -312,5 +341,11 @@ export class TaskService {
     }
 
     return savedTask;
+  }
+
+  async updateCerPath(id: number, path: string): Promise<Task> {
+    const task = await this.findOne(id);
+    task.path_pdf_cer = path;
+    return this.taskRepo.save(task);
   }
 }

@@ -40,9 +40,19 @@ export class PmChecklistService {
     await this.dataSource.transaction(async (manager) => {
       const task = await manager.findOne(Task, {
         where: { id: dto.task_id },
+        relations: ['technician'],
       });
       if (!task) {
         throw new NotFoundException(`Task #${dto.task_id} not found`);
+      }
+
+      // Freeze technician info if not already frozen or on every re-save
+      if (task.technician) {
+        const tech = task.technician as any;
+        task.technician_name = tech.name;
+        task.technician_position = tech.position;
+        task.technician_signature_url = tech.signatureUrl;
+        console.log(`[DEBUG-PM] Frozen Tech: ${task.technician_name}`);
       }
 
       // Remove previous results and remarks for idempotency
