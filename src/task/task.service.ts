@@ -1,3 +1,6 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 import { Injectable, NotFoundException } from '@nestjs/common';
@@ -98,19 +101,6 @@ export class TaskService {
       pm_no,
     });
     const saved = await this.taskRepo.save(task);
-
-    // Notify technician
-    try {
-      const fullTask = await this.findOne(saved.id);
-      if (fullTask.technician?.lineUserId) {
-        await this.lineService.pushMessage(
-          fullTask.technician.lineUserId,
-          `🔔 มีงานใหม่มอบหมายให้คุณ\nเลขที่: ${fullTask.pm_no}\nอุปกรณ์: ${fullTask.equipment?.name || '-'}\nสถานที่: ${fullTask.equipment?.section?.name || '-'}`,
-        );
-      }
-    } catch (err) {
-      console.error('Failed to send assignment notification', err);
-    }
 
     return saved;
   }
@@ -230,15 +220,6 @@ export class TaskService {
       const finalTask = await this.taskRepo.save(task);
       console.log('=== Task submitted successfully ===');
 
-      // Notify Head of Dept (Broadcast for now, or specific ID if configured)
-      try {
-        await this.lineService.broadcastMessage(
-          `📝 มีรายการรอนุมัติใหม่\nเลขที่: ${finalTask.pm_no}\nจาก: ${finalTask.technician?.name || 'ช่างเทคนิค'}\nผลการทดสอบ: ${finalTask.overall_result}`,
-        );
-      } catch (err) {
-        console.error('Failed to send submission notification', err);
-      }
-
       return finalTask;
     } catch (error) {
       console.error('Submit Task Error:', error);
@@ -322,24 +303,6 @@ export class TaskService {
     const savedTask = await this.taskRepo.save(task);
 
     // Notify technician about the decision
-    try {
-      if (savedTask.technician?.lineUserId) {
-        const title =
-          savedTask.status === 'Approved'
-            ? '✅ งานของคุณได้รับการอนุมัติแล้ว'
-            : '⚠️ งานของคุณถูกตีกลับให้สอบเทียบใหม่';
-        const remarks = savedTask.remarks
-          ? `\nหมายเหตุ: ${savedTask.remarks}`
-          : '';
-        await this.lineService.pushMessage(
-          savedTask.technician.lineUserId,
-          `${title}\nเลขที่: ${savedTask.pm_no}${remarks}`,
-        );
-      }
-    } catch (err) {
-      console.error('Failed to send approval notification', err);
-    }
-
     return savedTask;
   }
 
