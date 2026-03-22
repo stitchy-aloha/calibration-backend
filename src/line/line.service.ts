@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Client, TextMessage } from '@line/bot-sdk';
+import { Client, TextMessage, FlexMessage, FlexContainer } from '@line/bot-sdk';
 
 @Injectable()
 export class LineService {
@@ -39,6 +39,21 @@ export class LineService {
     }
   }
 
+  async pushFlexMessage(to: string, altText: string, contents: FlexContainer) {
+    if (!this.client) return;
+    try {
+      const message: FlexMessage = {
+        type: 'flex',
+        altText,
+        contents,
+      };
+      await this.client.pushMessage(to, message);
+      this.logger.log(`Successfully sent flex message to ${to}`);
+    } catch (error) {
+      this.logger.error(`Failed to send flex message to ${to}`, error);
+    }
+  }
+
   async broadcastMessage(text: string) {
     if (!this.client) return;
     try {
@@ -50,6 +65,21 @@ export class LineService {
       this.logger.log('Successfully sent broadcast message');
     } catch (error) {
       this.logger.error('Failed to send broadcast message', error);
+    }
+  }
+
+  async broadcastFlexMessage(altText: string, contents: FlexContainer) {
+    if (!this.client) return;
+    try {
+      const message: FlexMessage = {
+        type: 'flex',
+        altText,
+        contents,
+      };
+      await this.client.broadcast(message);
+      this.logger.log('Successfully sent broadcast flex message');
+    } catch (error) {
+      this.logger.error('Failed to send broadcast flex message', error);
     }
   }
 
