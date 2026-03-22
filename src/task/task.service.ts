@@ -243,6 +243,7 @@ export class TaskService {
     if (dto.decision === 'Approve') {
       task.status = 'Approved';
       task.approver_id = dto.approver_id;
+      task.approvedAt = new Date();
       task.remarks = dto.remarks;
 
       if (task.equipment_id) {

@@ -98,4 +98,7 @@ export class Task {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @Column({ type: 'datetime', nullable: true })
+  approvedAt: Date;
 }
