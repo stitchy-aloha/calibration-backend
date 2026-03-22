@@ -21,6 +21,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { EquipmentService } from './equipment.service.js';
 import { CreateEquipmentDto } from './dto/create-equipment.dto.js';
 import { UpdateEquipmentDto } from './dto/update-equipment.dto.js';
+import { Public } from '../auth/decorators/public.decorator.js';
 
 @ApiTags('Equipment')
 @Controller('equipment')
@@ -28,6 +29,18 @@ import { UpdateEquipmentDto } from './dto/update-equipment.dto.js';
 @ApiBearerAuth()
 export class EquipmentController {
   constructor(private readonly equipmentService: EquipmentService) {}
+
+  @Public()
+  @Get('public-status/:id')
+  @ApiOperation({ summary: 'ดูข้อมูลเครื่องมือแบบสาธารณะ (ผ่าน QR Code)' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({
+    status: 200,
+    description: 'คืนค่า Equipment Status & History',
+  })
+  async getPublicStatus(@Param('id') id: string) {
+    return this.equipmentService.getPublicStatus(id);
+  }
 
   @Get()
   @ApiOperation({ summary: 'ดูรายการเครื่องมือทั้งหมด' })

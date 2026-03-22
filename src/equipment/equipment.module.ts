@@ -1,14 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Equipment } from './equipment.entity';
-import { EquipmentType } from './equipment-type.entity';
-import { EquipmentService } from './equipment.service';
-import { EquipmentTypeService } from './equipment-type.service';
-import { EquipmentController } from './equipment.controller';
-import { EquipmentTypeController } from './equipment-type.controller';
+import { Equipment } from './equipment.entity.js';
+import { EquipmentType } from './equipment-type.entity.js';
+import { Task } from '../task/task.entity.js';
+import { EquipmentService } from './equipment.service.js';
+import { EquipmentTypeService } from './equipment-type.service.js';
+import { EquipmentController } from './equipment.controller.js';
+import { EquipmentTypeController } from './equipment-type.controller.js';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Equipment, EquipmentType])],
+  imports: [TypeOrmModule.forFeature([Equipment, EquipmentType, Task])],
   controllers: [EquipmentController, EquipmentTypeController],
   providers: [EquipmentService, EquipmentTypeService],
   exports: [EquipmentService, EquipmentTypeService],
