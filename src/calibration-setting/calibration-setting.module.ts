@@ -1,0 +1,13 @@
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { CalibrationSetting } from './calibration-setting.entity';
+import { CalibrationSettingService } from './calibration-setting.service';
+import { CalibrationSettingController } from './calibration-setting.controller';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([CalibrationSetting])],
+  providers: [CalibrationSettingService],
+  controllers: [CalibrationSettingController],
+  exports: [CalibrationSettingService],
+})
+export class CalibrationSettingModule {}

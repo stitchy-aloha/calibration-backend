@@ -19,7 +19,7 @@ export class NotificationService {
     private readonly lineService: LineService,
   ) {}
 
-  @Cron('0 19 * * *')
+  @Cron('0 11 * * *')
   async handleCalibrationDueNotifications() {
     this.logger.log('Running scheduled calibration due notifications check...');
 

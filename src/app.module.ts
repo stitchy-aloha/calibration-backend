@@ -17,6 +17,7 @@ import { CalibrationProcessModule } from './calibration-process/calibration-proc
 import { CalibrationCostModule } from './calibration-cost/calibration-cost.module.js';
 import { LineModule } from './line/line.module.js';
 import { NotificationModule } from './notification/notification.module.js';
+import { CalibrationSettingModule } from './calibration-setting/calibration-setting.module.js';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { NotificationModule } from './notification/notification.module.js';
     CalibrationCostModule,
     LineModule,
     NotificationModule,
+    CalibrationSettingModule,
   ],
   controllers: [AppController],
   providers: [AppService],
