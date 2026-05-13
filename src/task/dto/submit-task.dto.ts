@@ -77,6 +77,14 @@ class MeasurementDto {
   @IsOptional()
   @IsNumber()
   ucb3?: number;
+
+  @ApiProperty({
+    example: '1 - แบบอ้างอิงเครื่องมาตรฐาน (1 STD : 3 UUT)',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  std_type?: string;
 }
 
 class QualitativeDto {

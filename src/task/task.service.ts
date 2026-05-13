@@ -155,6 +155,7 @@ export class TaskService {
           measurement.ucb1 = m.ucb1 ?? null;
           measurement.ucb2 = m.ucb2 ?? null;
           measurement.ucb3 = m.ucb3 ?? null;
+          measurement.std_type = m.std_type ?? null;
           measurement.task = task;
           await this.measurementRepo.save(measurement);
         }
