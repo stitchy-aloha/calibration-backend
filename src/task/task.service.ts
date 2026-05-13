@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Task } from './task.entity.js';
@@ -106,6 +106,8 @@ export class TaskService {
   }
 
   async submitTask(id: number, dto: SubmitTaskDto): Promise<Task> {
+    const fs = require('fs');
+    fs.appendFileSync('submit_debug.log', `\n[${new Date().toISOString()}] Task ${id} DTO: ${JSON.stringify(dto)}\n`);
     console.log(`=== Submitting task ${id} ===`);
     try {
       // Load task WITHOUT the child relations (environments/measurements/qualitatives)
@@ -190,18 +192,34 @@ export class TaskService {
         );
       }
 
-      // 5. Link Standard Tools
-      if (dto.standard_tool_ids && dto.standard_tool_ids.length > 0) {
-        const standardTools = await this.standardToolRepo.findBy({
-          id: In(dto.standard_tool_ids),
-        });
-        task.standardTools = standardTools;
+      // 5. Link Standard Tools (Manual relation update for reliability)
+      if (dto.standard_tool_ids) {
+        console.log(`Explicitly linking tools for task ${id}:`, dto.standard_tool_ids);
+        
+        // 1. Clear existing relations
+        if (task.standardTools && task.standardTools.length > 0) {
+          await this.taskRepo
+            .createQueryBuilder()
+            .relation(Task, 'standardTools')
+            .of(task)
+            .remove(task.standardTools);
+        }
+
+        // 2. Add new relations
+        if (dto.standard_tool_ids.length > 0) {
+          await this.taskRepo
+            .createQueryBuilder()
+            .relation(Task, 'standardTools')
+            .of(task)
+            .add(dto.standard_tool_ids);
+          console.log(`Successfully added ${dto.standard_tool_ids.length} tools via QueryBuilder`);
+        }
       }
 
       // Freeze technician info
       if (task.technician) {
-        const tech = task.technician as any;
-        task.technician_name = tech.name;
+        const tech = task.technician;
+        task.technician_name = tech.name || '';
         task.technician_position = tech.position;
         task.technician_signature_url = tech.signatureUrl;
         console.log(`[DEBUG] Frozen Tech: ${task.technician_name}, ${task.technician_position}`);
@@ -224,7 +242,7 @@ export class TaskService {
       return finalTask;
     } catch (error) {
       console.error('Submit Task Error:', error);
-      throw error;
+      throw new BadRequestException(`Submit failed: ${error.message}`);
     }
   }
 
@@ -238,9 +256,9 @@ export class TaskService {
       task.remarks = dto.remarks;
 
       // Freeze approver info
-      const approverFetch = (await this.userRepo.findOne({
+      const approverFetch = await this.userRepo.findOne({
         where: { id: dto.approver_id },
-      })) as any;
+      });
       if (approverFetch) {
         task.approver_name = approverFetch.name;
         task.approver_position = approverFetch.position;
@@ -250,7 +268,7 @@ export class TaskService {
 
       // Safety: also freeze technician info if missing (for legacy tasks being approved now)
       if (!task.technician_name && task.technician) {
-        const tech = task.technician as any;
+        const tech = task.technician;
         task.technician_name = tech.name;
         task.technician_position = tech.position;
         task.technician_signature_url = tech.signatureUrl;

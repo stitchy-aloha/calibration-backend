@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { IsString, IsNotEmpty, IsOptional, IsEnum, IsInt } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum, IsInt, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { ICalibrationTestValue } from '../calibration-setting.entity';
 
@@ -67,8 +67,9 @@ export class CreateCalibrationSettingDto {
   @IsOptional()
   test_values?: ICalibrationTestValue[];
 
-  @ApiProperty()
-  @IsInt()
+  @ApiProperty({ type: [Number], required: false })
+  @IsArray()
+  @IsInt({ each: true })
   @IsOptional()
-  standard_tool_id?: number;
+  standard_tool_ids?: number[];
 }

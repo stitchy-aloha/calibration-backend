@@ -5,8 +5,8 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToOne,
-  JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { StandardTool } from '../standard-tool/standard-tool.entity';
 
@@ -59,12 +59,13 @@ export class CalibrationSetting {
   @Column({ type: 'json', nullable: true })
   test_values: ICalibrationTestValue[];
 
-  @Column({ type: 'int', nullable: true })
-  standard_tool_id: number;
-
-  @ManyToOne(() => StandardTool)
-  @JoinColumn({ name: 'standard_tool_id' })
-  standardTool: StandardTool;
+  @ManyToMany(() => StandardTool)
+  @JoinTable({
+    name: 'calibration_setting_standard_tools',
+    joinColumn: { name: 'calibration_setting_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'standard_tool_id', referencedColumnName: 'id' },
+  })
+  standardTools: StandardTool[];
 
   @CreateDateColumn()
   created_at: Date;

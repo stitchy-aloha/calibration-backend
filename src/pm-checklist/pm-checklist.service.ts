@@ -50,7 +50,7 @@ export class PmChecklistService {
 
       // Freeze technician info if not already frozen or on every re-save
       if (task.technician) {
-        const tech = task.technician as any;
+        const tech = task.technician;
         task.technician_name = tech.name;
         task.technician_position = tech.position;
         task.technician_signature_url = tech.signatureUrl;

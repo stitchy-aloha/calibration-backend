@@ -9,6 +9,16 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors();
+  
+  // Debug logger
+  app.use((req, res, next) => {
+    const fs = require('fs');
+    fs.appendFileSync('submit_debug.log', `[${new Date().toISOString()}] ${req.method} ${req.url}\n`);
+    if (req.method !== 'GET') {
+      fs.appendFileSync('submit_debug.log', `Body: ${JSON.stringify(req.body)}\n`);
+    }
+    next();
+  });
 
   // Serve uploaded files as static
   app.useStaticAssets(join(process.cwd(), 'uploads'), {
