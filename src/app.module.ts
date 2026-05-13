@@ -26,14 +26,14 @@ import { CalibrationSettingModule } from './calibration-setting/calibration-sett
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get<string>('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 5432),
-        username: configService.get<string>('DB_USERNAME', 'postgres'),
-        password: configService.get<string>('DB_PASSWORD', '349224'),
-        database: configService.get<string>('DB_DATABASE', 'calibration'),
+        type: configService.get<'postgres' | 'mysql'>('DB_TYPE', 'postgres'),
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
-        synchronize: true, // ⚠️ disable in production
+        synchronize: configService.get<boolean>('DB_SYNCHRONIZE', false),
       }),
       inject: [ConfigService],
     }),
