@@ -69,3 +69,6 @@ GEMINI.md
 # Scratch and Uploads
 /scratch
 /uploads
+
+backup.sql
+submit_debug.log

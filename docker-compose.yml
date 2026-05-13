@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: cal-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-349224}
+      POSTGRES_DB: ${DB_DATABASE:-calibration}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  backend:
+    build: .
+    container_name: cal-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: db # เชื่อมต่อไปที่ service 'db' ข้างบน
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-349224}
+      DB_DATABASE: ${DB_DATABASE:-calibration}
+      DB_SYNCHRONIZE: "true"
+      JWT_SECRET: ${JWT_SECRET:-super-secret-key}
+      JWT_EXPIRES_IN: "1d"
+      PORT: 3000
+    depends_on:
+      - db
+    command: npm run start:dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./uploads:/app/uploads
+
+volumes:
+  postgres_data:
