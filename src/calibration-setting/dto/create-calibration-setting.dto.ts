@@ -71,5 +71,5 @@ export class CreateCalibrationSettingDto {
   @IsArray()
   @IsInt({ each: true })
   @IsOptional()
-  standard_tool_ids?: number[];
+  category_ids?: number[];
 }

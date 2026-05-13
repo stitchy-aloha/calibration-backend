@@ -4,25 +4,25 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { CalibrationSetting } from './calibration-setting.entity';
 import { CreateCalibrationSettingDto } from './dto/create-calibration-setting.dto';
-import { StandardTool } from '../standard-tool/standard-tool.entity';
+import { StandardToolCategory } from '../standard-tool/standard-tool-category.entity';
 
 @Injectable()
 export class CalibrationSettingService {
   constructor(
     @InjectRepository(CalibrationSetting)
     private readonly repository: Repository<CalibrationSetting>,
-    @InjectRepository(StandardTool)
-    private readonly standardToolRepo: Repository<StandardTool>,
+    @InjectRepository(StandardToolCategory)
+    private readonly categoryRepo: Repository<StandardToolCategory>,
   ) {}
 
   async findAll() {
-    return this.repository.find({ relations: ['standardTools'] });
+    return this.repository.find({ relations: ['categories'] });
   }
 
   async findByEquipment(equipmentName: string) {
     return this.repository.find({
       where: { equipment_name: equipmentName },
-      relations: ['standardTools'],
+      relations: ['categories'],
     });
   }
 
@@ -30,8 +30,6 @@ export class CalibrationSettingService {
     console.log(`Saving batch settings for ${equipmentName}:`, JSON.stringify(dtos, null, 2));
     
     // 1. Delete existing settings for this equipment
-    // Note: Due to ManyToMany, we might need to be careful, but TypeORM should handle the join table deletion if cascading is set up.
-    // If not, we might need to manually clear the relations first, but since we delete the row, it should be fine.
     await this.repository.delete({ equipment_name: equipmentName });
 
     // 2. Save new settings
@@ -43,12 +41,12 @@ export class CalibrationSettingService {
         equipment_name: equipmentName,
       });
 
-      if (dto.standard_tool_ids && dto.standard_tool_ids.length > 0) {
-        entity.standardTools = await this.standardToolRepo.find({
-          where: { id: In(dto.standard_tool_ids) }
+      if (dto.category_ids && dto.category_ids.length > 0) {
+        entity.categories = await this.categoryRepo.find({
+          where: { id: In(dto.category_ids) }
         });
       } else {
-        entity.standardTools = [];
+        entity.categories = [];
       }
 
       savedEntities.push(await this.repository.save(entity));
