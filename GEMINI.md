@@ -11,7 +11,7 @@ This file contains the specific rules and tech stack details for the `cal_backen
 - **Core Framework:** NestJS (v11)
 - **Language:** TypeScript
 - **Database ORM:** TypeORM (v0.3.x)
-- **Database Driver:** MySQL (`mysql2`)
+- **Database Driver:** PostgreSQL (`pg`)
 - **Authentication:** Passport, JWT (`@nestjs/jwt`, `@nestjs/passport`), Bcrypt
 - **Validation:** `class-validator`, `class-transformer`
 - **API Documentation:** OpenAPI / Swagger (`@nestjs/swagger`)
