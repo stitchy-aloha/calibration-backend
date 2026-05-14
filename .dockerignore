@@ -5,3 +5,4 @@ npm-debug.log
 .env
 uploads
 submit_debug.log
+backup.sql
