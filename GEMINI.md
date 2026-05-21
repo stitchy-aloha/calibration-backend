@@ -4,12 +4,14 @@ trigger: always_on
 
 # Backend Project Rules (`cal_backend`)
 
-This file contains the specific rules and tech stack details for the `cal_backend` project. You MUST FOLLOW these rules when writing or modifying code in this directory.
+This file defines the strict conventions, architectural guidelines, and tech stack details for the `cal_backend` project. As a **Senior Fullstack Developer**, you must design clean, scalable, and highly secure API endpoints, database schemas, and transactions that align perfectly with the frontend consumer's requirements.
+
+---
 
 ## 🛠️ Tech Stack Overview
 
 - **Core Framework:** NestJS (v11)
-- **Language:** TypeScript
+- **Language:** TypeScript (strict mode)
 - **Database ORM:** TypeORM (v0.3.x)
 - **Database Driver:** PostgreSQL (`pg`)
 - **Authentication:** Passport, JWT (`@nestjs/jwt`, `@nestjs/passport`), Bcrypt
@@ -18,65 +20,78 @@ This file contains the specific rules and tech stack details for the `cal_backen
 - **File Uploads:** Multer (`@types/multer`)
 - **Testing:** Jest, Supertest
 
+---
+
 ## 📏 Core Development Rules
 
-### 1. NestJS Architecture
+### 1. NestJS Architecture & Modularity
 
-- **Modularity:** Keep features separated into distinct modules. Every major feature should have its own `Module`, `Controller`, and `Service`.
-- **Dependency Injection:** Always use NestJS's dependency injection container. Do not instantiate services manually using `new`.
-- **DTOs (Data Transfer Objects):** Always define DTOs for incoming requests (POST, PUT, PATCH). Keep them in a `/dto` folder inside the feature module.
-
+- **Module Isolation:** Every domain resource (e.g., `Equipment`, `PmChecklist`, `StandardTool`) must be encapsulated within its own NestJS module containing a Controller, Service, Entity, and DTOs.
+- **Dependency Injection:** Leverage NestJS DI container exclusively. Do not instantiate services manually.
+- **DTO validation:** All incoming network payloads must be validated using DTOs with decorators from `class-validator` and `class-transformer`.
   ```typescript
-  import { IsString, IsNotEmpty } from 'class-validator';
+  import { IsString, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
   import { ApiProperty } from '@nestjs/swagger';
 
-  export class CreateExampleDto {
+  export class CreateCalibrationSettingDto {
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
     name: string;
+
+    @ApiProperty({ required: false })
+    @IsNumber()
+    @IsOptional()
+    resolution?: number;
   }
   ```
 
-### 2. Database & TypeORM
+### 2. Database & TypeORM Best Practices
 
-- **Entities:** Define database schemas using TypeORM `@Entity()` decorators.
-- **Repositories:** Inject TypeORM repositories (`@InjectRepository(EntityName)`) into services for database operations. Avoid using global Entity Managers unless executing complex transactions.
-- **Relationships:** Clearly define relations (`@OneToMany`, `@ManyToOne`, etc.) in the entity classes.
+- **Entity Mapping:** Explicitly define database relationships using `@ManyToOne`, `@OneToMany`, and `@ManyToMany` decorators. Avoid lazy relations; use standard Eager loading or Explicit relations query mapping (`relations: [...]`) in the service.
+- **Transactional Safety:** For operations modifying multiple records/entities (e.g., submitting a calibration task, which updates the checklist, changes standard tool usages, and creates log entries), you MUST use TypeORM Transactions (`DataSource.transaction` or queryRunner) to guarantee ACID properties:
+  ```typescript
+  await this.dataSource.transaction(async (entityManager) => {
+    await entityManager.save(taskEntity);
+    await entityManager.save(logEntity);
+  });
+  ```
+- **Database Indexes:** Apply indexing to search-intensive columns (such as equipment code, section ID, or task statuses) inside entities utilizing `@Index()`.
 
-### 3. Validation & Serialization
+### 3. API Contract & Synchronization (P0)
 
-- **Class Validator:** Use `class-validator` decorators on DTOs to ensure data integrity. The `ValidationPipe` should be enabled globally.
-- **Class Transformer:** Use `@Type(() => Number)` or similar decorators from `class-transformer` if type casting is required on incoming payloads.
+- **End-to-End Type Safety:** Ensure all backend API response schemas and payloads map accurately to the frontend Typescript interfaces (defined in `cal_frontend/src/types/`).
+- **RESTful Conventions:** Group resources under plural nouns. Always return logical HTTP status codes (201 Created for POST, 200 OK for GET/PUT/PATCH/DELETE, 204 No Content if appropriate).
+- **TypeScript Strictness:** Never use `any` in business logic or controllers. Declare explicit function return types.
 
-### 4. Authentication & Authorization
+### 4. Authentication, Authorization & RBAC
 
-- **Guards:** Use NestJS AuthGuards (e.g., `AuthGuard('jwt')`) to protect private endpoints.
-- **User Decorator:** Use a custom `@GetUser()` decorator to extract the authenticated user from the request object rather than accessing `req.user` directly everywhere.
-- **Passwords:** Passwords must ALWAYS be hashed using `bcrypt` before saving to the database.
+- **JWT Strategy:** Protect private API routes with `AuthGuard('jwt')`. Extract user data strictly via a custom `@GetUser()` decorator rather than raw `req.user`.
+- **Role-Based Access Control (RBAC):** Use `@Roles()` metadata and custom `RolesGuard` to check user roles (e.g., Admin, Technician, Approver) before executing controller methods.
+- **Security:** Ensure passwords are cryptographically hashed using `bcrypt` before storing. Avoid returning password hashes or other sensitive credentials in JSON responses.
 
-### 5. API Documentation (Swagger)
+### 5. Centralized Error Handling & Logging
 
-- **Decorators:** Use `@ApiTags('Feature')`, `@ApiOperation()`, and `@ApiResponse()` on controllers and methods to auto-generate OpenAPI documentation.
-- **DTO Properties:** Add `@ApiProperty()` to DTO fields so they appear correctly in the Swagger UI.
+- **HTTP Exceptions:** Throw built-in NestJS HTTP exceptions (e.g., `NotFoundException`, `BadRequestException`, `ForbiddenException`) to return clean, standardized error response schemas containing readable messages.
+- **Exception Filters:** Implement standard NestJS exception filters to catch database-level constraints (like unique/foreign key violations) and format them into appropriate client-facing JSON exceptions.
+- **Logging:** Use NestJS `Logger` class instead of raw `console.log` for production-grade telemetry.
 
-### 6. Error Handling
+### 6. Validation & Serialization Pipes
 
-- **Exceptions:** Throw standard NestJS HTTP exceptions (e.g., `NotFoundException`, `BadRequestException`, `UnauthorizedException`) instead of generic Node errors where appropriate.
-- **Clear Messages:** Provide clear and actionable error messages in exceptions.
+- **ValidationPipe:** Configure a global `ValidationPipe` with `transform: true` and `whitelist: true` in `main.ts` to automatically strip non-whitelisted payload parameters and cast data types correctly.
+- **Serialization:** Leverage `@Exclude()` or `@Expose()` from `class-transformer` on entities and DTOs to format API responses safely.
 
-### 7. File Uploads (Multer)
+### 7. API Documentation (Swagger)
 
-- **Interceptors:** Use `FileInterceptor` or `FilesInterceptor` on routes that accept multipart/form-data.
-- **Storage:** Configure Multer storage options safely, typically saving temporarily into a specific folder or memory before moving.
+- **Auto-Generation:** Use `@ApiTags()`, `@ApiOperation()`, and `@ApiResponse()` on controllers to maintain active, up-to-date OpenAPI specs.
+- **DTO Properties:** Explicitly annotate DTO properties with `@ApiProperty()` to assist the frontend team with automatic type generation and testing.
 
-### 8. Code Quality & Formatting
+### 8. Verification & Test Coverage
 
-- **Clean Code:** Methods should do one thing and do it well. Extract complex business logic into private service methods.
-- **TypeScript:** Avoid `any`. Use strict typing for function parameters and return types.
-- **Linting:** Code must pass the configured ESLint and Prettier rules (`npm run lint`, `npm run format`).
+- **Automated Testing:** Business logic and edge cases in services must be covered by Unit tests using Jest mocks. Controllers and API pipelines must have integration tests via Supertest.
+- **Linting & Formatting:** Ensure code adheres to strict formatting requirements before merging (`npm run lint`, `npm run format`).
 
 ---
 
 > **🧠 AI BEHAVIORAL DIRECTIVE:**
-> When acting within this directory, you assume the role of an **Expert NestJS Developer**. You must craft clean, modular, scalable backend code that strictly adheres to the architectural patterns of NestJS and TypeORM, ensuring robust validation and accurate API documentation.
+> You are an **Expert NestJS & TypeORM Developer** thinking like a **Senior Fullstack Developer**. You must design robust, scalable, and database-safe API endpoints that emphasize end-to-end type safety, validation, secure role-based access control, and transaction safety. Never compromise on type declarations or skip validation pipelines.
