@@ -48,21 +48,6 @@ export class CreateCalibrationSettingDto {
   @IsOptional()
   uncertainty?: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  ucb1?: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  ucb2?: string;
-
-  @ApiProperty()
-  @IsString()
-  @IsOptional()
-  ucb3?: string;
-
   @ApiProperty({ isArray: true, type: () => Object })
   @IsOptional()
   test_values?: ICalibrationTestValue[];

@@ -63,21 +63,6 @@ class MeasurementDto {
   @IsString()
   resolution?: string;
 
-  @ApiProperty({ example: 0.002, required: false })
-  @IsOptional()
-  @IsNumber()
-  ucb1?: number;
-
-  @ApiProperty({ example: 0, required: false })
-  @IsOptional()
-  @IsNumber()
-  ucb2?: number;
-
-  @ApiProperty({ example: 0, required: false })
-  @IsOptional()
-  @IsNumber()
-  ucb3?: number;
-
   @ApiProperty({
     example: '1 - แบบอ้างอิงเครื่องมาตรฐาน (1 STD : 3 UUT)',
     required: false,

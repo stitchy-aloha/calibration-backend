@@ -47,15 +47,6 @@ export class CalibrationSetting {
   @Column({ type: 'varchar', length: 50, nullable: true })
   uncertainty: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: true })
-  ucb1: string;
-
-  @Column({ type: 'varchar', length: 50, nullable: true })
-  ucb2: string;
-
-  @Column({ type: 'varchar', length: 50, nullable: true })
-  ucb3: string;
-
   @Column({ type: 'json', nullable: true })
   test_values: ICalibrationTestValue[];
 

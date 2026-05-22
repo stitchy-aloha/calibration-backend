@@ -15,26 +15,8 @@ export class Measurement {
   @Column({ type: 'varchar', length: 255 })
   parameter_name: string;
 
-  @Column({ type: 'float', nullable: true })
-  range: number;
-
-  @Column({ type: 'float', nullable: true })
-  standard_value: number;
-
-  @Column({ type: 'float', nullable: true })
-  reading_1: number;
-
-  @Column({ type: 'float', nullable: true })
-  reading_2: number;
-
-  @Column({ type: 'float', nullable: true })
-  reading_3: number;
-
-  @Column({ type: 'float', nullable: true })
-  average_value: number;
-
-  @Column({ type: 'float', nullable: true })
-  error_value: number;
+  @Column({ type: 'jsonb', nullable: true })
+  data: any;
 
   @Column({ type: 'enum', enum: ['PASS', 'FAIL'], default: 'PASS' })
   result: 'PASS' | 'FAIL';
@@ -44,15 +26,6 @@ export class Measurement {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   resolution: string | null;
-
-  @Column({ type: 'float', nullable: true })
-  ucb1: number | null;
-
-  @Column({ type: 'float', nullable: true })
-  ucb2: number | null;
-
-  @Column({ type: 'float', nullable: true })
-  ucb3: number | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   std_type: string | null;

@@ -170,21 +170,23 @@ export class TaskService {
         for (const m of dto.measurements) {
           const measurement = new Measurement();
           measurement.parameter_name = m.parameter_name;
-          measurement.range = m.range ?? 0;
-          measurement.standard_value = m.standard_value ?? 0;
-          measurement.reading_1 = m.reading_1 ?? 0;
-          measurement.reading_2 = m.reading_2 ?? 0;
-          measurement.reading_3 = m.reading_3 ?? 0;
-          measurement.average_value = m.average_value ?? 0;
-          measurement.error_value = m.error_value ?? 0;
           measurement.result = m.result;
           measurement.display_type = m.display_type ?? null;
           measurement.resolution = m.resolution ?? null;
-          measurement.ucb1 = m.ucb1 ?? null;
-          measurement.ucb2 = m.ucb2 ?? null;
-          measurement.ucb3 = m.ucb3 ?? null;
           measurement.std_type = m.std_type ?? null;
           measurement.task = task;
+
+          // Pack numeric results into JSONB data column
+          measurement.data = {
+            range: m.range ?? 0,
+            standard_value: m.standard_value ?? 0,
+            reading_1: m.reading_1 ?? null,
+            reading_2: m.reading_2 ?? null,
+            reading_3: m.reading_3 ?? null,
+            average_value: m.average_value ?? 0,
+            error_value: m.error_value ?? 0,
+          };
+
           await this.measurementRepo.save(measurement);
         }
         console.log(`${dto.measurements.length} measurements saved`);
