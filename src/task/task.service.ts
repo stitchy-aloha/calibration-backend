@@ -7,7 +7,7 @@
 
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Task } from './task.entity.js';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { SubmitTaskDto } from './dto/submit-task.dto.js';
@@ -220,27 +220,16 @@ export class TaskService {
         );
       }
 
-      // 5. Link Standard Tools (Manual relation update for reliability)
+      // 5. Link Standard Tools
       if (dto.standard_tool_ids) {
         console.log(`Explicitly linking tools for task ${id}:`, dto.standard_tool_ids);
-        
-        // 1. Clear existing relations
-        if (task.standardTools && task.standardTools.length > 0) {
-          await this.taskRepo
-            .createQueryBuilder()
-            .relation(Task, 'standardTools')
-            .of(task)
-            .remove(task.standardTools);
-        }
-
-        // 2. Add new relations
         if (dto.standard_tool_ids.length > 0) {
-          await this.taskRepo
-            .createQueryBuilder()
-            .relation(Task, 'standardTools')
-            .of(task)
-            .add(dto.standard_tool_ids);
-          console.log(`Successfully added ${dto.standard_tool_ids.length} tools via QueryBuilder`);
+          const tools = await this.standardToolRepo.find({
+            where: { id: In(dto.standard_tool_ids) },
+          });
+          task.standardTools = tools;
+        } else {
+          task.standardTools = [];
         }
       }
 
