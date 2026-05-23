@@ -10,6 +10,7 @@ import { Qualitative } from './entities/qualitative.entity.js';
 import { SpecificParameter } from './entities/specific-parameter.entity.js';
 import { User } from '../user/user.entity.js';
 import { EquipmentModule } from '../equipment/equipment.module.js';
+import { StorageModule } from '../storage/storage.module.js';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { EquipmentModule } from '../equipment/equipment.module.js';
       User,
     ]),
     EquipmentModule,
+    StorageModule,
   ],
   controllers: [TaskController],
   providers: [TaskService],

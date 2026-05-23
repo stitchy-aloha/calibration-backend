@@ -18,8 +18,8 @@ import {
   ApiConsumes,
   ApiBody,
 } from '@nestjs/swagger';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { memoryStorage } from 'multer';
+import { StorageService } from '../storage/storage.service.js';
 import { HospitalService } from './hospital.service.js';
 import { CreateHospitalDto } from './dto/create-hospital.dto.js';
 import { UpdateHospitalDto } from './dto/update-hospital.dto.js';
@@ -27,7 +27,10 @@ import { UpdateHospitalDto } from './dto/update-hospital.dto.js';
 @ApiTags('Hospital')
 @Controller('hospital')
 export class HospitalController {
-  constructor(private readonly hospitalService: HospitalService) {}
+  constructor(
+    private readonly hospitalService: HospitalService,
+    private readonly storageService: StorageService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new hospital' })
@@ -53,26 +56,19 @@ export class HospitalController {
   })
   @UseInterceptors(
     FileInterceptor('logo', {
-      storage: diskStorage({
-        destination: './uploads/hospitals',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, `hosp-${uniqueSuffix}${extname(file.originalname)}`);
-        },
-      }),
+      storage: memoryStorage(),
     }),
   )
   @ApiResponse({
     status: 201,
     description: 'The hospital has been successfully created.',
   })
-  create(
+  async create(
     @Body() createHospitalDto: CreateHospitalDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (file) {
-      createHospitalDto.logoUrl = `/uploads/hospitals/${file.filename}`;
+      createHospitalDto.logoUrl = await this.storageService.uploadFile(file, 'hospitals');
     }
     return this.hospitalService.create(createHospitalDto);
   }
@@ -113,23 +109,24 @@ export class HospitalController {
   })
   @UseInterceptors(
     FileInterceptor('logo', {
-      storage: diskStorage({
-        destination: './uploads/hospitals',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          cb(null, `hosp-${uniqueSuffix}${extname(file.originalname)}`);
-        },
-      }),
+      storage: memoryStorage(),
     }),
   )
-  update(
+  async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateHospitalDto: UpdateHospitalDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (file) {
-      updateHospitalDto.logoUrl = `/uploads/hospitals/${file.filename}`;
+      try {
+        const existing = await this.hospitalService.findOne(id);
+        if (existing && existing.logoUrl) {
+          await this.storageService.deleteFile(existing.logoUrl);
+        }
+      } catch (err) {
+        // Ignore if delete fails
+      }
+      updateHospitalDto.logoUrl = await this.storageService.uploadFile(file, 'hospitals');
     }
     return this.hospitalService.update(id, updateHospitalDto);
   }

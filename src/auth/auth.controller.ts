@@ -16,8 +16,8 @@ import {
   ApiConsumes,
   ApiBody,
 } from '@nestjs/swagger';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { memoryStorage } from 'multer';
+import { StorageService } from '../storage/storage.service.js';
 import { AuthService } from './auth.service.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RegisterDto } from './dto/register.dto.js';
@@ -27,18 +27,15 @@ interface RequestWithUser {
   user: { userId: number; username: string };
 }
 
-const imageStorage = diskStorage({
-  destination: './uploads/profiles',
-  filename: (_req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, `profile-${uniqueSuffix}${extname(file.originalname)}`);
-  },
-});
+
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly storageService: StorageService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'สมัครสมาชิก (พร้อมอัปโหลดรูป)' })
@@ -58,13 +55,13 @@ export class AuthController {
       required: ['username', 'password'],
     },
   })
-  @UseInterceptors(FileInterceptor('image', { storage: imageStorage }))
-  register(
+  @UseInterceptors(FileInterceptor('image', { storage: memoryStorage() }))
+  async register(
     @Body() registerDto: RegisterDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     if (file) {
-      registerDto.imageUrl = `/uploads/profiles/${file.filename}`;
+      registerDto.imageUrl = await this.storageService.uploadFile(file, 'profiles');
     }
     return this.authService.register(registerDto);
   }

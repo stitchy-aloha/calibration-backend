@@ -11,8 +11,8 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
+import { memoryStorage } from 'multer';
+import { StorageService } from '../storage/storage.service.js';
 import {
   ApiTags,
   ApiOperation,
@@ -30,7 +30,10 @@ import { ApproveTaskDto } from './dto/approve-task.dto.js';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(
+    private readonly taskService: TaskService,
+    private readonly storageService: StorageService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'ดูรายการ Task PM ทั้งหมด (Admin)' })
@@ -75,26 +78,15 @@ export class TaskController {
   @ApiBearerAuth()
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './uploads/certs',
-        filename: (req, file, cb) => {
-          const randomName = Array(32)
-            .fill(null)
-            .map(() => Math.round(Math.random() * 16).toString(16))
-            .join('');
-          return cb(null, `${randomName}${extname(file.originalname)}`);
-        },
-      }),
+      storage: memoryStorage(),
     }),
   )
   @ApiOperation({ summary: 'อัปโหลดไฟล์ CER PDF' })
-  uploadCer(
+  async uploadCer(
     @Param('id', ParseIntPipe) id: number,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.taskService.updateCerPath(
-      id,
-      `/uploads/certs/${file.filename}`,
-    );
+    const fileUrl = await this.storageService.uploadFile(file, 'certs');
+    return this.taskService.updateCerPath(id, fileUrl);
   }
 }

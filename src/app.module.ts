@@ -18,6 +18,7 @@ import { CalibrationCostModule } from './calibration-cost/calibration-cost.modul
 import { LineModule } from './line/line.module.js';
 import { NotificationModule } from './notification/notification.module.js';
 import { CalibrationSettingModule } from './calibration-setting/calibration-setting.module.js';
+import { StorageModule } from './storage/storage.module.js';
 
 @Module({
   imports: [
