@@ -185,6 +185,10 @@ export class TaskService {
             reading_3: m.reading_3 ?? null,
             average_value: m.average_value ?? 0,
             error_value: m.error_value ?? 0,
+            std_reading_1: m.std_reading_1 ?? null,
+            std_reading_2: m.std_reading_2 ?? null,
+            std_reading_3: m.std_reading_3 ?? null,
+            average_standard: m.average_standard ?? null,
           };
 
           await this.measurementRepo.save(measurement);

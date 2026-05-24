@@ -50,6 +50,26 @@ class MeasurementDto {
   @IsNumber()
   error_value?: number;
 
+  @ApiProperty({ example: 120, required: false })
+  @IsOptional()
+  @IsNumber()
+  std_reading_1?: number;
+
+  @ApiProperty({ example: 120, required: false })
+  @IsOptional()
+  @IsNumber()
+  std_reading_2?: number;
+
+  @ApiProperty({ example: 120, required: false })
+  @IsOptional()
+  @IsNumber()
+  std_reading_3?: number;
+
+  @ApiProperty({ example: 120, required: false })
+  @IsOptional()
+  @IsNumber()
+  average_standard?: number;
+
   @ApiProperty({ enum: ['PASS', 'FAIL'], example: 'PASS' })
   @IsEnum(['PASS', 'FAIL'])
   result: 'PASS' | 'FAIL';
