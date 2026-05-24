@@ -16,13 +16,17 @@ export class CalibrationSettingService {
   ) {}
 
   async findAll() {
-    return this.repository.find({ relations: ['categories'] });
+    return this.repository.find({
+      relations: ['categories'],
+      order: { id: 'ASC' },
+    });
   }
 
   async findByEquipment(equipmentName: string) {
     return this.repository.find({
       where: { equipment_name: equipmentName },
       relations: ['categories'],
+      order: { id: 'ASC' },
     });
   }
 

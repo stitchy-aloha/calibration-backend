@@ -65,7 +65,7 @@ class MeasurementDto {
   resolution?: string;
 
   @ApiProperty({
-    example: '1 - แบบอ้างอิงเครื่องมาตรฐาน (1 STD : 3 UUT)',
+    example: '1 - แบบอ้างอิงเครื่องมาตรฐาน (1 STD : 3 UUC)',
     required: false,
   })
   @IsOptional()
